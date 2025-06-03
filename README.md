@@ -1,23 +1,21 @@
 [![MseeP.ai Security Assessment Badge](https://mseep.net/pr/wrale-mcp-server-tree-sitter-badge.png)](https://mseep.ai/app/wrale-mcp-server-tree-sitter)
 
-# MCP Tree-sitter Server
+# MCP Repo Memory Server
 
-A Model Context Protocol (MCP) server that provides code analysis capabilities using tree-sitter, designed to give AI assistants intelligent access to codebases with appropriate context management. Claude Desktop is the reference implementation target.
+A Model Context Protocol (MCP) server that provides enhanced repo memory and code analysis capabilities using tree-sitter, designed to give AI assistants intelligent access to codebases with persistent memory and contextual understanding. This is an enhanced version of the original mcp-server-tree-sitter with additional repo memory features.
 
-<a href="https://glama.ai/mcp/servers/@wrale/mcp-server-tree-sitter">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/@wrale/mcp-server-tree-sitter/badge" alt="mcp-server-tree-sitter MCP server" />
-</a>
+## Enhanced Features
 
-## Features
-
+- 🧠 **Repo Memory**: Persistent memory across MCP sessions with intelligent context retention
 - 🔍 **Flexible Exploration**: Examine code at multiple levels of granularity
-- 🧠 **Context Management**: Provides just enough information without overwhelming the context window
+- 📚 **Context Management**: Provides just enough information without overwhelming the context window
 - 🌐 **Language Agnostic**: Supports many programming languages including Python, JavaScript, TypeScript, Go, Rust, C, C++, Swift, Java, Kotlin, Julia, and APL via tree-sitter-language-pack
 - 🌳 **Structure-Aware**: Uses AST-based understanding with efficient cursor-based traversal
-- 🔎 **Searchable**: Find specific patterns using text search and tree-sitter queries
-- 🔄 **Caching**: Optimized performance through parse tree caching
+- 🔎 **Enhanced Search**: Find specific patterns using text search, tree-sitter queries, and semantic understanding
+- 🔄 **Intelligent Caching**: Optimized performance through parse tree caching and memory persistence
 - 🔑 **Symbol Extraction**: Extract and analyze functions, classes, and other code symbols
 - 📊 **Dependency Analysis**: Identify and analyze code dependencies and relationships
+- 🎯 **Repo Intelligence**: Track project context, changes, and development patterns over time
 - 🧩 **State Persistence**: Maintains project registrations and cached data between invocations
 - 🔒 **Secure**: Built-in security boundaries and input validation
 

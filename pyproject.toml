@@ -3,14 +3,15 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mcp-server-tree-sitter"
+name = "mcp-server-repo-memory"
 version = "0.5.1"
-description = "MCP Server for Tree-sitter code analysis"
+description = "MCP Server for enhanced repo memory and code analysis with Tree-sitter"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Wrale LTD", email = "contact@wrale.com"}
+    {name = "Wrale LTD", email = "contact@wrale.com"},
+    {name = "Rick Barraza", email = "rkb@generativesynthetics.com"}
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",

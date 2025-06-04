@@ -289,7 +289,7 @@ class ProjectMemory:
             return chunks
         
         # Simple file extension filter
-        code_extensions = {'.py', '.js', '.ts', '.java', '.cpp', '.c', '.go', '.rs', '.swift'}
+        code_extensions = {'.py', '.js', '.ts', '.jsx', '.tsx', '.java', '.cpp', '.c', '.go', '.rs', '.swift'}
         
         try:
             for file_path in project_dir.rglob('*'):

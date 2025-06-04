@@ -29,6 +29,7 @@ dependencies = [
     "pyyaml>=6.0",
     "pydantic>=2.0.0",
     "types-pyyaml>=6.0.12.20241230",
+    "chromadb>=0.4.0",
 ]
 
 [project.optional-dependencies]

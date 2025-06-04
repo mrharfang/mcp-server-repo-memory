@@ -29,7 +29,34 @@ This document tracks the enhancement plan for transforming the mcp-server-tree-s
 - All dependencies installed and tests passing
 - Project identity updated to reflect repo memory-enhanced capabilities
 
-### Milestone 2: Enhanced Memory Capabilities (NEXT)
+### Milestone 2: Memory Infrastructure ✅ COMPLETE
+**Goal**: Implement core memory services for embedding generation, vector storage, and semantic chunking.
+
+**Completed Features**:
+- [x] EmbeddingService with mock backend for text embedding generation
+- [x] ProjectMemory service with ChromaDB integration for vector storage
+- [x] Semantic chunking and code analysis capabilities
+- [x] MemoryConfig integration with existing configuration system
+- [x] Dependency injection (DI) container integration for memory services
+- [x] Type definitions for memory-related data structures
+- [x] Comprehensive test suite verifying all memory infrastructure
+
+**Key Files Implemented**:
+- `src/mcp_server_tree_sitter/services/embedding_service.py` - Text embedding generation
+- `src/mcp_server_tree_sitter/services/project_memory.py` - Vector storage and retrieval
+- `src/mcp_server_tree_sitter/types/memory.py` - Memory type definitions
+- Extended `config.py` and `di.py` for memory integration
+- `test_milestone_2.py` - Comprehensive verification tests
+
+**Status**: ✅ Complete
+**Completion Date**: 2025-06-03
+**Notes**: 
+- All memory infrastructure components are functional and tested
+- ChromaDB integration working with proper metadata handling
+- Mock embedding backend ready for future real model integration
+- DI container properly provides memory services as singletons
+
+### Milestone 3: Enhanced Memory Capabilities (NEXT)
 **Goal**: Implement persistent memory and intelligent repo context tracking.
 
 **Planned Features**:

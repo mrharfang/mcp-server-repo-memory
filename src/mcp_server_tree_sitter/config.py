@@ -21,6 +21,7 @@ from pydantic import BaseModel, Field
 
 # Import logging from bootstrap package
 from .bootstrap import get_logger, update_log_levels
+from .types.memory import MemoryConfig
 
 logger = get_logger(__name__)
 
@@ -55,6 +56,7 @@ class ServerConfig(BaseModel):
     cache: CacheConfig = Field(default_factory=CacheConfig)
     security: SecurityConfig = Field(default_factory=SecurityConfig)
     language: LanguageConfig = Field(default_factory=LanguageConfig)
+    memory: MemoryConfig = Field(default_factory=MemoryConfig)
     log_level: str = "INFO"
     max_results_default: int = 100
 

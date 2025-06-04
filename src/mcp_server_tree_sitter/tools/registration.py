@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from ..di import DependencyContainer
 from ..exceptions import ProjectError
+from .memory_tools import register_memory_tools
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,11 @@ def register_tools(mcp_server: Any, container: DependencyContainer) -> None:
     tree_cache = container.tree_cache
     project_registry = container.project_registry
     language_registry = container.language_registry
+    project_memory = container.project_memory
+    embedding_service = container.embedding_service
+
+    # Register memory tools
+    register_memory_tools(mcp_server, project_memory, embedding_service)
 
     # Configuration Tool
     @mcp_server.tool()

@@ -56,7 +56,32 @@ This document tracks the enhancement plan for transforming the mcp-server-tree-s
 - Mock embedding backend ready for future real model integration
 - DI container properly provides memory services as singletons
 
-### Milestone 3: Enhanced Memory Capabilities (NEXT)
+### Milestone 3: MCP Tool Extensions ✅ COMPLETE
+**Goal**: Implement MCP tools that expose project memory functionality to users.
+
+**Completed Features**:
+- [x] `index_project_memory` - Create or update semantic memory index for a codebase project
+- [x] `query_project_memory` - Semantic search across indexed codebase using natural language 
+- [x] `list_project_memories` - Show all indexed projects and their memory statistics
+- [x] Integration with existing MCP server tool registration system
+- [x] Proper async/sync bridge for memory service calls
+- [x] Comprehensive testing and functional verification
+
+**Key Files Implemented**:
+- `src/mcp_server_tree_sitter/tools/memory_tools.py` - Memory tool implementations
+- Extended `src/mcp_server_tree_sitter/tools/registration.py` for tool registration
+- `test_milestone_3.py` - Verification tests
+- `test_memory_tools_functional.py` - Functional flow tests
+
+**Status**: ✅ Complete
+**Completion Date**: 2025-06-03
+**Notes**: 
+- All three memory tools properly registered and functional
+- Tools successfully bridge sync MCP framework with async memory services
+- Full end-to-end testing from indexing to querying working
+- Memory tools ready for real-world usage with existing MCP clients
+
+### Milestone 4: Enhanced Memory Capabilities (NEXT)
 **Goal**: Implement persistent memory and intelligent repo context tracking.
 
 **Planned Features**:
@@ -68,12 +93,12 @@ This document tracks the enhancement plan for transforming the mcp-server-tree-s
 
 **Status**: 🔄 Pending
 
-### Milestone 3: Advanced Intelligence Features (FUTURE)
+### Milestone 5: Advanced Intelligence Features (FUTURE)
 **Goal**: Add sophisticated code analysis and project understanding capabilities.
 
 **Status**: 📋 Planned
 
-### Milestone 4: Integration and Optimization (FUTURE)
+### Milestone 6: Integration and Optimization (FUTURE)
 **Goal**: Optimize performance and integrate with development workflows.
 
 **Status**: 📋 Planned

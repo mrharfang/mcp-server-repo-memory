@@ -9,7 +9,6 @@ from ..utils.security import validate_file_access
 
 logger = logging.getLogger(__name__)
 
-
 def list_project_files(
     project: Any,
     pattern: Optional[str] = None,
@@ -28,6 +27,10 @@ def list_project_files(
     Returns:
         List of relative file paths
     """
+    from ..api import get_config
+    config = get_config()
+    excluded_dirs = config.security.excluded_dirs
+
     root = project.root_path
     pattern = pattern or "**/*"
     files = []
@@ -43,7 +46,13 @@ def list_project_files(
 
                 # Get path relative to project root
                 rel_path = path.relative_to(root)
-                files.append(str(rel_path))
+                
+                # Check if file is in excluded directory
+                path_parts = rel_path.parts
+                is_excluded = any(excluded in path_parts for excluded in excluded_dirs)
+                
+                if not is_excluded:
+                    files.append(str(rel_path))
 
         return sorted(files)
 
@@ -69,7 +78,12 @@ def list_project_files(
 
             # Get path relative to project root
             rel_path = path.relative_to(root)
-            files.append(str(rel_path))
+
+            path_parts = rel_path.parts
+            is_excluded = any(excluded in path_parts for excluded in excluded_dirs)
+
+            if not is_excluded:
+                files.append(str(rel_path))
 
     return sorted(files)
 

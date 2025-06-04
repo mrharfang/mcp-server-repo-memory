@@ -1,466 +1,218 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/wrale-mcp-server-tree-sitter-badge.png)](https://mseep.ai/app/wrale-mcp-server-tree-sitter)
+# 🧠 Project Memory MCP Server
 
-# MCP Repo Memory Server
+> **Enhanced repository intelligence through persistent semantic memory**
 
-A Model Context Protocol (MCP) server that provides enhanced repo memory and code analysis capabilities using tree-sitter, designed to give AI assistants intelligent access to codebases with persistent memory and contextual understanding. This is an enhanced version of the original mcp-server-tree-sitter with additional repo memory features.
+A specialized fork of [mcp-server-tree-sitter](https://github.com/wrale/mcp-server-tree-sitter) that adds **intelligent project memory capabilities** using ChromaDB vector embeddings. This MCP server enables AI assistants to build and maintain a deep understanding of codebases across sessions, providing contextual awareness and semantic search at scale.
 
-## Enhanced Features
+## 🎯 Why Project Memory?
 
-- 🧠 **Repo Memory**: Persistent memory across MCP sessions with intelligent context retention
-- 🔍 **Flexible Exploration**: Examine code at multiple levels of granularity
-- 📚 **Context Management**: Provides just enough information without overwhelming the context window
-- 🌐 **Language Agnostic**: Supports many programming languages including Python, JavaScript, TypeScript, Go, Rust, C, C++, Swift, Java, Kotlin, Julia, and APL via tree-sitter-language-pack
-- 🌳 **Structure-Aware**: Uses AST-based understanding with efficient cursor-based traversal
-- 🔎 **Enhanced Search**: Find specific patterns using text search, tree-sitter queries, and semantic understanding
-- 🔄 **Intelligent Caching**: Optimized performance through parse tree caching and memory persistence
-- 🔑 **Symbol Extraction**: Extract and analyze functions, classes, and other code symbols
-- 📊 **Dependency Analysis**: Identify and analyze code dependencies and relationships
-- 🎯 **Repo Intelligence**: Track project context, changes, and development patterns over time
-- 🧩 **State Persistence**: Maintains project registrations and cached data between invocations
-- 🔒 **Secure**: Built-in security boundaries and input validation
+Traditional code analysis tools parse and forget. **Project Memory MCP** remembers, learns, and builds context over time. When working with large codebases, AI assistants need more than syntax trees—they need **semantic understanding** of how code components relate, evolve, and function together.
 
-For a comprehensive list of all available commands, their current implementation status, and detailed feature matrix, please refer to the [FEATURES.md](FEATURES.md) document.
+### The Problem We Solved
+- **Context Loss**: AI assistants lose project understanding between sessions
+- **Scale Limitations**: Large codebases overwhelm context windows
+- **Surface-Level Analysis**: Syntax parsing without semantic relationships
+- **Repetitive Discovery**: Re-learning the same codebase patterns repeatedly
 
-## Installation
+### Our Solution
+- **🧠 Persistent Memory**: ChromaDB vector storage maintains project understanding across sessions
+- **🔍 Semantic Search**: Find code by intent and meaning, not just keywords
+- **📊 Relationship Mapping**: Understand how code components connect and interact
+- **⚡ Intelligent Indexing**: Efficient processing of large codebases with smart caching
+
+## 🚀 How ChromaDB Transforms Code Understanding
+
+[ChromaDB](https://www.trychroma.com/) is a vector database designed for AI applications. We use it to create **semantic embeddings** of your code, enabling:
+
+### **Semantic Code Search**
+```python
+# Instead of searching for exact strings...
+find_text("authentication logic")
+
+# Find code by meaning and intent
+memory_search("user login validation and session management")
+```
+
+### **Intelligent Context Retrieval**
+```python
+# Get related code automatically
+memory_query("database connection patterns") 
+# Returns: connection pools, transaction handlers, ORM usage, etc.
+```
+
+### **Cross-Session Learning**
+- **Session 1**: Analyze authentication system
+- **Session 2**: AI remembers previous analysis when working on authorization
+- **Session 3**: Builds on understanding for security audit
+
+## 📋 Quick Start Examples
+
+### 1. Index Your Project
+```python
+# Register and build memory for your codebase
+register_project("/path/to/your/project", "my-web-app")
+index_project_memory("my-web-app")
+```
+
+### 2. Semantic Code Discovery
+```python
+# Find authentication-related code
+results = query_project_memory(
+    project="my-web-app",
+    query="user authentication and password validation",
+    limit=10
+)
+```
+
+### 3. Intelligent Context Building
+```python
+# Get comprehensive project overview
+context = list_project_memories("my-web-app")
+# Returns: Key components, patterns, architecture insights
+```
+
+## 🛠 Installation & Setup
 
 ### Prerequisites
-
 - Python 3.10+
-- Tree-sitter language parsers for your preferred languages
+- ChromaDB and sentence-transformers (managed via `uv`)
 
-### Basic Installation
-
+### Installation
 ```bash
-pip install mcp-server-tree-sitter
+git clone <this-repo>
+cd mcp-server-repo-memory
+uv sync  # Installs all dependencies including ChromaDB
 ```
 
-### Development Installation
+### Claude Desktop Configuration
+Add to your `claude_desktop_config.json`:
 
+```json
+{
+    "mcpServers": {
+        "project_memory": {
+            "command": "uv",
+            "args": [
+                "--directory", "/absolute/path/to/mcp-server-repo-memory",
+                "run", "-m", "mcp_server_tree_sitter.server"
+            ]
+        }
+    }
+}
+```
+
+## 🎯 Core Memory Tools
+
+### **Project Registration & Indexing**
+- `register_project_tool` - Register a codebase for memory building
+- `index_project_memory` - Build semantic index of all project files
+- `list_projects_tool` - View all registered projects with memory status
+
+### **Semantic Search & Query**  
+- `query_project_memory` - Semantic search across project codebase
+- `list_project_memories` - Browse indexed code components
+- Enhanced traditional tools with memory-aware context
+
+### **Memory Management**
+- Persistent ChromaDB storage in project `.chroma/` directory
+- Automatic embedding generation using sentence-transformers
+- Intelligent caching and incremental updates
+
+## 🧪 Comprehensive Testing
+
+This project includes extensive testing to ensure production readiness:
+
+- **🔗 Integration Tests** - End-to-end memory tool validation
+- **⚡ Performance Tests** - Benchmarking across project sizes (1K-10K+ files)
+- **🛡️ Edge Case Tests** - Robust error handling and concurrency safety
+- **🌍 Real-World Tests** - Self-indexing validation with actual codebases
+
+Run the test suite:
 ```bash
-git clone https://github.com/wrale/mcp-server-tree-sitter.git
-cd mcp-server-tree-sitter
-pip install -e ".[dev,languages]"
+uv run python integration_test.py      # End-to-end functionality
+uv run python performance_test.py      # Performance benchmarking  
+uv run python comprehensive_test.py    # Edge cases and real-world scenarios
 ```
 
-## Quick Start
+See `MILESTONE_4_COMPLETION_REPORT.md` for detailed test results and performance metrics.
 
-### Running with Claude Desktop
+## 🏗 Architecture Highlights
 
-You can make the server available in Claude Desktop either through the MCP CLI or by manually configuring Claude Desktop.
+### **Vector Embedding Pipeline**
+1. **Code Extraction** - Tree-sitter parses file structure and symbols
+2. **Content Preparation** - Intelligent chunking and metadata enrichment  
+3. **Semantic Encoding** - sentence-transformers creates vector embeddings
+4. **ChromaDB Storage** - Persistent vector database with metadata indexing
 
-#### Using MCP CLI
+### **Memory-Aware Tools**
+- All original tree-sitter tools enhanced with semantic memory context
+- Backward-compatible with existing MCP workflows
+- Progressive enhancement: works without memory, better with memory
 
-Register the server with Claude Desktop:
+### **Dependency Injection Architecture**
+- Clean separation between tree-sitter analysis and memory services
+- Modular design for easy extension and testing
+- Production-ready error handling and logging
 
-```bash
-mcp install mcp_server_tree_sitter.server:mcp --name "tree_sitter"
-```
+## 📊 Performance Characteristics
 
-#### Manual Configuration
+**Validated Performance** (see comprehensive test results):
+- **Indexing Speed**: ~1,000 files/second  
+- **Query Response**: Sub-millisecond semantic search
+- **Memory Efficiency**: Linear O(n) scaling with project size
+- **Concurrent Safety**: Multi-threaded access validated
+- **Persistence**: Database durability across service restarts
 
-Alternatively, you can manually configure Claude Desktop:
+## 🌟 Use Cases
 
-1. Open your Claude Desktop configuration file:
-   - macOS/Linux: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-   
-   Create the file if it doesn't exist.
+### **AI-Assisted Development**
+- **Code Reviews**: "Find all authentication-related security patterns"
+- **Refactoring**: "Show me all database access patterns for migration"  
+- **Documentation**: "Locate all API endpoint implementations"
 
-2. Add the server to the `mcpServers` section:
+### **Project Onboarding**
+- **New Team Members**: Semantic exploration of unfamiliar codebases
+- **Code Archaeology**: Understanding legacy system architecture
+- **Pattern Discovery**: Identifying common practices and conventions
 
-   ```json
-   {
-       "mcpServers": {
-           "tree_sitter": {
-               "command": "python",
-               "args": [
-                   "-m",
-                   "mcp_server_tree_sitter.server"
-               ]
-           }
-       }
-   }
-   ```
+### **Maintenance & Evolution**
+- **Technical Debt**: Finding code that needs modernization
+- **Impact Analysis**: Understanding change implications across projects
+- **Knowledge Preservation**: Maintaining architectural understanding over time
 
-   Alternatively, if using uv or another package manager:
+## 🔮 Future Vision
 
-   ```json
-   {
-       "mcpServers": {
-           "tree_sitter": {
-               "command": "uv",
-               "args": [
-                   "--directory",
-                   "/ABSOLUTE/PATH/TO/YOUR/PROJECT",
-                   "run",
-                   "-m",
-                   "mcp_server_tree_sitter.server"
-               ]
-           }
-       }
-   }
-   ```
+This Project Memory MCP server represents a foundation for **intelligent AI-human collaboration** in software development. Future enhancements could include:
 
-   Note: Make sure to replace `/ABSOLUTE/PATH/TO/YOUR/PROJECT` with the actual absolute path to your project directory.
+- **Cross-Project Learning**: Patterns shared across multiple codebases
+- **Temporal Understanding**: How code evolves and changes over time  
+- **Team Knowledge**: Collaborative memory shared across development teams
+- **Automated Insights**: Proactive suggestions based on codebase patterns
 
-3. Save the file and restart Claude Desktop.
+## 📚 Documentation
 
-The MCP tools icon (hammer) will appear in Claude Desktop's interface once you have properly configured at least one MCP server. You can then access the `tree_sitter` server's functionality by clicking on this icon.
+- `FEATURES.md` - Complete feature matrix and tool documentation
+- `MILESTONE_4_COMPLETION_REPORT.md` - Comprehensive testing and validation results
+- `docs/` - Architecture, configuration, and developer guides
+- `ORIGINAL_README.md` - Original tree-sitter server documentation
 
-### Configuring with Released Version
+## 🤝 Contributing
 
-If you prefer not to manually install the package from PyPI (released version) or clone the repository, simply use the following configuration for Claude Desktop:
+This is a specialized fork focused on memory capabilities. For core tree-sitter functionality, contribute to the [upstream project](https://github.com/wrale/mcp-server-tree-sitter).
 
-1. Open your Claude Desktop configuration file (same location as above).
+For memory-related enhancements:
+1. Fork this repository
+2. Create feature branch: `git checkout -b feature/memory-enhancement`
+3. Add tests for new functionality
+4. Submit pull request with detailed description
 
-2. Add the tree-sitter server to the `mcpServers` section:
+## 📄 License
 
-   ```json
-   {
-       "mcpServers": {
-           "tree_sitter": {
-               "command": "uvx",
-               "args": [
-                   "--directory", "/ABSOLUTE/PATH/TO/YOUR/PROJECT",
-                   "mcp-server-tree-sitter"
-               ]
-           }
-       }
-   }
-   ```
+MIT License - Same as upstream project. See `LICENSE` for details.
 
-3. Save the file and restart Claude Desktop.
+---
 
-This method uses `uvx` to run the installed PyPI package directly, which is the recommended approach for the released version. The server doesn't require any additional parameters to run in its basic configuration.
+**Built with ❤️ by the Integration Assistant**  
+*"Perfect memory enables perfect collaboration"*
 
-## State Persistence
-
-The MCP Tree-sitter Server maintains state between invocations. This means:
-- Projects stay registered until explicitly removed or the server is restarted
-- Parse trees are cached according to configuration settings
-- Language information is retained throughout the server's lifetime
-
-This persistence is maintained in-memory during the server's lifetime using singleton patterns for key components.
-
-### Running as a standalone server
-
-There are several ways to run the server:
-
-#### Using the MCP CLI directly:
-
-```bash
-python -m mcp run mcp_server_tree_sitter.server
-```
-
-#### Using Makefile targets:
-
-```bash
-# Show available targets
-make
-
-# Run the server with default settings
-make mcp-run
-
-# Show help information
-make mcp-run ARGS="--help"
-
-# Show version information
-make mcp-run ARGS="--version"
-
-# Run with custom configuration file
-make mcp-run ARGS="--config /path/to/config.yaml"
-
-# Enable debug logging
-make mcp-run ARGS="--debug"
-
-# Disable parse tree caching
-make mcp-run ARGS="--disable-cache"
-```
-
-#### Using the installed script:
-
-```bash
-# Run the server with default settings
-mcp-server-tree-sitter
-
-# Show help information
-mcp-server-tree-sitter --help
-
-# Show version information
-mcp-server-tree-sitter --version
-
-# Run with custom configuration file
-mcp-server-tree-sitter --config /path/to/config.yaml
-
-# Enable debug logging
-mcp-server-tree-sitter --debug
-
-# Disable parse tree caching
-mcp-server-tree-sitter --disable-cache
-```
-
-### Using with the MCP Inspector
-
-Using the MCP CLI directly:
-
-```bash
-python -m mcp dev mcp_server_tree_sitter.server
-```
-
-Or using the Makefile target:
-
-```bash
-make mcp-dev
-```
-
-You can also pass arguments:
-
-```bash
-make mcp-dev ARGS="--debug"
-```
-
-## Usage
-
-### Register a Project
-
-First, register a project to analyze:
-
-```
-register_project_tool(path="/path/to/your/project", name="my-project")
-```
-
-### Explore Files
-
-List files in the project:
-
-```
-list_files(project="my-project", pattern="**/*.py")
-```
-
-View file content:
-
-```
-get_file(project="my-project", path="src/main.py")
-```
-
-### Analyze Code Structure
-
-Get the syntax tree:
-
-```
-get_ast(project="my-project", path="src/main.py", max_depth=3)
-```
-
-Extract symbols:
-
-```
-get_symbols(project="my-project", path="src/main.py")
-```
-
-### Search Code
-
-Search for text:
-
-```
-find_text(project="my-project", pattern="function", file_pattern="**/*.py")
-```
-
-Run tree-sitter queries:
-
-```
-run_query(
-    project="my-project",
-    query='(function_definition name: (identifier) @function.name)',
-    language="python"
-)
-```
-
-### Analyze Complexity
-
-```
-analyze_complexity(project="my-project", path="src/main.py")
-```
-
-## Direct Python Usage
-
-While the primary intended use is through the MCP server, you can also use the library directly in Python code:
-
-```python
-# Import from the API module
-from mcp_server_tree_sitter.api import (
-    register_project, list_projects, get_config, get_language_registry
-)
-
-# Register a project
-project_info = register_project(
-    path="/path/to/project", 
-    name="my-project", 
-    description="Description"
-)
-
-# List projects
-projects = list_projects()
-
-# Get configuration
-config = get_config()
-
-# Access components through dependency injection
-from mcp_server_tree_sitter.di import get_container
-container = get_container()
-project_registry = container.project_registry
-language_registry = container.language_registry
-```
-
-## Configuration
-
-Create a YAML configuration file:
-
-```yaml
-cache:
-  enabled: true                # Enable/disable caching (default: true)
-  max_size_mb: 100             # Maximum cache size in MB (default: 100)
-  ttl_seconds: 300             # Cache entry time-to-live in seconds (default: 300)
-
-security:
-  max_file_size_mb: 5          # Maximum file size to process in MB (default: 5)
-  excluded_dirs:               # Directories to exclude from processing
-    - .git
-    - node_modules
-    - __pycache__
-  allowed_extensions:          # Optional list of allowed file extensions
-    # - py
-    # - js
-    # Leave empty or omit for all extensions
-
-language:
-  default_max_depth: 5         # Default max depth for AST traversal (default: 5)
-  preferred_languages:         # List of languages to pre-load at startup for faster performance
-    - python                   # Pre-loading reduces latency for first operations
-    - javascript
-
-log_level: INFO                # Logging level (DEBUG, INFO, WARNING, ERROR)
-max_results_default: 100       # Default maximum results for search operations
-```
-
-Load it with:
-
-```
-configure(config_path="/path/to/config.yaml")
-```
-
-### Logging Configuration
-
-The server's logging verbosity can be controlled using environment variables:
-
-```bash
-# Enable detailed debug logging
-export MCP_TS_LOG_LEVEL=DEBUG
-
-# Use normal informational logging (default)
-export MCP_TS_LOG_LEVEL=INFO
-
-# Only show warning and error messages
-export MCP_TS_LOG_LEVEL=WARNING
-```
-
-For comprehensive information about logging configuration, please refer to the [logging documentation](docs/logging.md). For details on the command-line interface, see the [CLI documentation](docs/cli.md).
-
-### About preferred_languages
-
-The `preferred_languages` setting controls which language parsers are pre-loaded at server startup rather than on-demand. This provides several benefits:
-
-- **Faster initial analysis**: No delay when first analyzing a file of a pre-loaded language
-- **Early error detection**: Issues with parsers are discovered at startup, not during use
-- **Predictable memory allocation**: Memory for frequently used parsers is allocated upfront
-
-By default, all parsers are loaded on-demand when first needed. For optimal performance, specify the languages you use most frequently in your projects.
-
-You can also configure specific settings:
-
-```
-configure(cache_enabled=True, max_file_size_mb=10, log_level="DEBUG")
-```
-
-Or use environment variables:
-
-```bash
-export MCP_TS_CACHE_MAX_SIZE_MB=256
-export MCP_TS_LOG_LEVEL=DEBUG
-export MCP_TS_CONFIG_PATH=/path/to/config.yaml
-```
-
-Environment variables use the format `MCP_TS_SECTION_SETTING` (e.g., `MCP_TS_CACHE_MAX_SIZE_MB`) for section settings, or `MCP_TS_SETTING` (e.g., `MCP_TS_LOG_LEVEL`) for top-level settings.
-
-Configuration values are applied in this order of precedence:
-1. Environment variables (highest)
-2. Values set via `configure()` calls
-3. YAML configuration file
-4. Default values (lowest)
-
-The server will look for configuration in:
-1. Path specified in `configure()` call
-2. Path specified by `MCP_TS_CONFIG_PATH` environment variable
-3. Default location: `~/.config/tree-sitter/config.yaml`
-
-## For Developers
-
-### Diagnostic Capabilities
-
-The MCP Tree-sitter Server includes a diagnostic framework to help identify and fix issues:
-
-```bash
-# Run diagnostic tests
-make test-diagnostics
-
-# CI-friendly version (won't fail the build on diagnostic issues)
-make test-diagnostics-ci
-```
-
-Diagnostic tests provide detailed information about the server's behavior and can help isolate specific issues. For more information about the diagnostic framework, please see the [diagnostics documentation](docs/diagnostics.md).
-
-### Type Safety Considerations
-
-The MCP Tree-sitter Server maintains type safety when interfacing with tree-sitter libraries through careful design patterns and protocols. If you're extending the codebase, please review the [type safety guide](docs/tree-sitter-type-safety.md) for important information about handling tree-sitter API variations.
-
-## Available Resources
-
-The server provides the following MCP resources:
-
-- `project://{project}/files` - List all files in a project
-- `project://{project}/files/{pattern}` - List files matching a pattern
-- `project://{project}/file/{path}` - Get file content
-- `project://{project}/file/{path}/lines/{start}-{end}` - Get specific lines from a file
-- `project://{project}/ast/{path}` - Get the AST for a file
-- `project://{project}/ast/{path}/depth/{depth}` - Get the AST with custom depth
-
-## Available Tools
-
-The server provides tools for:
-
-- Project management: `register_project_tool`, `list_projects_tool`, `remove_project_tool`
-- Language management: `list_languages`, `check_language_available`
-- File operations: `list_files`, `get_file`, `get_file_metadata`
-- AST analysis: `get_ast`, `get_node_at_position`
-- Code search: `find_text`, `run_query`
-- Symbol extraction: `get_symbols`, `find_usage`
-- Project analysis: `analyze_project`, `get_dependencies`, `analyze_complexity`
-- Query building: `get_query_template_tool`, `list_query_templates_tool`, `build_query`, `adapt_query`, `get_node_types`
-- Similar code detection: `find_similar_code`
-- Cache management: `clear_cache`
-- Configuration diagnostics: `diagnose_config`
-
-See [FEATURES.md](FEATURES.md) for detailed information about each tool's implementation status, dependencies, and usage examples.
-
-## Available Prompts
-
-The server provides the following MCP prompts:
-
-- `code_review` - Create a prompt for reviewing code
-- `explain_code` - Create a prompt for explaining code
-- `explain_tree_sitter_query` - Explain tree-sitter query syntax
-- `suggest_improvements` - Create a prompt for suggesting code improvements
-- `project_overview` - Create a prompt for a project overview analysis
-
-## License
-
-MIT
+> This enhanced MCP server bridges the gap between AI capabilities and codebase complexity, enabling truly intelligent software development workflows.

@@ -6,6 +6,33 @@ import logging
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor
+import threading
+
+
+from concurrent.futures import ThreadPoolExecutor
+import threading
+
+
+def _run_async_in_sync(async_func, *args, **kwargs):
+    """Run an async function from sync context safely.
+    
+    This avoids the 'asyncio.run() cannot be called from a running event loop' error
+    by running the async function in a separate thread with its own event loop.
+    """
+    def run_in_thread():
+        # Create a new event loop for this thread
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(async_func(*args, **kwargs))
+        finally:
+            loop.close()
+    
+    # Run the async function in a separate thread
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(run_in_thread)
+        return future.result()
 
 
 def register_memory_tools(mcp_server: Any, project_memory: Any, embedding_service: Any) -> None:
@@ -46,11 +73,13 @@ def register_memory_tools(mcp_server: Any, project_memory: Any, embedding_servic
 
         try:
             # Call ProjectMemory.index_project() (async method)
-            result = asyncio.run(project_memory.index_project(
+            # Use thread-based async execution to avoid event loop conflicts
+            result = _run_async_in_sync(
+                project_memory.index_project,
                 project_path=project_path,
                 project_name=project_name,
                 force_reindex=force_reindex
-            ))
+            )
 
             elapsed_time = time.time() - start_time
 
@@ -94,11 +123,13 @@ def register_memory_tools(mcp_server: Any, project_memory: Any, embedding_servic
 
         try:
             # Call ProjectMemory.query_memory() (async method)
-            results = asyncio.run(project_memory.query_memory(
+            # Use thread-based async execution to avoid event loop conflicts
+            results = _run_async_in_sync(
+                project_memory.query_memory,
                 query=query,
                 project_name=project_name,
                 limit=context_limit
-            ))
+            )
 
             execution_time = (time.time() - start_time) * 1000  # ms
 

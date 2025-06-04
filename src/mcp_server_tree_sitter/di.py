@@ -74,6 +74,16 @@ class DependencyContainer:
         """Get a registered dependency."""
         return self._additional.get(name)
 
+    @property
+    def embedding_service(self):
+        """Property accessor for embedding service."""
+        return self.get_embedding_service()
+
+    @property
+    def project_memory(self):
+        """Property accessor for project memory."""
+        return self.get_project_memory()
+
 
 # Create the single container instance - this will be the ONLY global
 container = DependencyContainer()

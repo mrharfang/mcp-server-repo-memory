@@ -31,6 +31,20 @@ def list_project_files(
     config = get_config()
     excluded_dirs = config.security.excluded_dirs
 
+    additional_excluded = {
+        '.venv', 'venv', '.env',           # Python virtual environments & env files
+        '__pycache__', '.pytest_cache',    # Python cache directories  
+        'node_modules', '.next',           # Node/React build artifacts
+        '.uv', 'uv.lock',                  # UV package manager
+        '.git', '.svn',                    # Version control
+        'dist', 'build', '.dist-info',     # Build outputs
+        '.DS_Store', 'Thumbs.db',          # OS artifacts
+        '.vscode', '.idea',                # IDE settings
+        'coverage', '.coverage',           # Test coverage
+        '.tox', '.mypy_cache'              # Additional Python tools
+    }
+    excluded_dirs = list(set(excluded_dirs) | additional_excluded)
+
     root = project.root_path
     pattern = pattern or "**/*"
     files = []

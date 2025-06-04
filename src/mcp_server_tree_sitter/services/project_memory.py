@@ -139,16 +139,22 @@ class ProjectMemory:
         
         # TODO: Integrate with existing tree-sitter parsing to extract chunks
         # For now, create a simple implementation that reads files
+        logger.info(f"Extracting chunks from project at: {project_path}")
         chunks = await self._extract_chunks_from_project(project_path, project_name)
         
         if not chunks:
-            logger.warning(f"No chunks extracted from project '{project_name}'")
-            return {"status": "no_chunks", "chunk_count": 0}
+            logger.warning(f"No chunks extracted from project '{project_name}' at {project_path}")
+            return {"status": "no_chunks", "chunk_count": 0, "files_processed": 0}
+        
+        logger.info(f"Successfully extracted {len(chunks)} chunks from project")
         
         # Generate embeddings
+        logger.info(f"Generating embeddings for {len(chunks)} chunks...")
         embedded_chunks = await self.embedding_service.batch_embed(chunks)
+        logger.info(f"Generated {len(embedded_chunks)} embeddings")
         
         # Store in ChromaDB
+        logger.info(f"Storing {len(embedded_chunks)} embedded chunks in ChromaDB...")
         stored_count = await self._store_embedded_chunks(collection, embedded_chunks)
         
         logger.info(f"Successfully indexed {stored_count} chunks for project '{project_name}'")
@@ -157,6 +163,8 @@ class ProjectMemory:
             "status": "indexed",
             "chunk_count": stored_count,
             "total_chunks_found": len(chunks),
+            "chunks_indexed": stored_count,
+            "files_processed": getattr(self, '_last_files_processed', 0),
             "project_path": project_path
         }
     
@@ -283,6 +291,9 @@ class ProjectMemory:
         """
         chunks = []
         project_dir = Path(project_path)
+        files_processed = 0
+        
+        logger.info(f"Starting chunk extraction from project: {project_path}")
         
         if not project_dir.exists():
             logger.warning(f"Project path does not exist: {project_path}")
@@ -292,32 +303,92 @@ class ProjectMemory:
         code_extensions = {'.py', '.js', '.ts', '.jsx', '.tsx', '.java', '.cpp', '.c', '.go', '.rs', '.swift'}
         
         try:
-            for file_path in project_dir.rglob('*'):
-                if file_path.is_file() and file_path.suffix in code_extensions:
-                    file_chunks = await self._extract_chunks_from_file(str(file_path), project_name)
+            # Import the secure file listing function
+            from ..tools.file_operations import list_project_files
+            from ..api import get_project_registry
+            
+            logger.debug(f"Looking for project registry...")
+            # Get the registered project to use secure file listing
+            project_registry = get_project_registry()
+            project_obj = None
+            
+            logger.debug(f"Project registry has {len(project_registry._projects)} projects")
+            
+            # Try to find the project by path
+            for project_id, project in project_registry._projects.items():
+                logger.debug(f"Checking project {project_id}: {project.root_path} vs {project_dir}")
+                if str(project.root_path) == str(project_dir):
+                    project_obj = project
+                    logger.info(f"Found existing project registration: {project_id}")
+                    break
+            
+            if not project_obj:
+                logger.info(f"Project not found in registry, registering temporarily...")
+                # Register project temporarily for secure file access
+                from ..api import register_project
+                register_result = register_project(str(project_dir), project_name)
+                logger.info(f"Registered project: {register_result}")
+                
+                # Now get the project object from registry
+                project_obj = project_registry.get_project(project_name)
+            
+            # Use secure file listing with code extensions
+            code_extensions_list = ['py', 'js', 'ts', 'jsx', 'tsx', 'java', 'cpp', 'c', 'go', 'rs', 'swift']
+            logger.info(f"Calling list_project_files with extensions: {code_extensions_list}")
+            
+            secure_files = list_project_files(project_obj, filter_extensions=code_extensions_list)
+            logger.info(f"list_project_files returned {len(secure_files)} files")
+            
+            if not secure_files:
+                logger.warning(f"No files found with extensions {code_extensions_list}")
+                # Let's try without extension filter to see if there are any files at all
+                all_files = list_project_files(project_obj)
+                logger.info(f"Total files in project (no filter): {len(all_files)}")
+                if all_files:
+                    logger.info(f"Sample files: {all_files[:10]}")
+            
+            for relative_path in secure_files:
+                full_file_path = project_dir / relative_path
+                logger.debug(f"Processing file: {full_file_path}")
+                
+                try:
+                    file_chunks = await self._extract_chunks_from_file(str(full_file_path), project_name)
+                    logger.debug(f"Extracted {len(file_chunks)} chunks from {relative_path}")
                     chunks.extend(file_chunks)
+                    files_processed += 1
                     
-                    # Limit for demo purposes
-                    if len(chunks) > 100:
-                        logger.warning(f"Limiting to first 100 chunks for demo")
-                        break
+                except Exception as file_error:
+                    logger.error(f"Failed to process file {full_file_path}: {file_error}")
+                    continue
+                    
         except Exception as e:
             logger.error(f"Failed to extract chunks from project {project_path}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
         
-        logger.info(f"Extracted {len(chunks)} chunks from project '{project_name}'")
+        logger.info(f"Extracted {len(chunks)} chunks from {files_processed} files in project '{project_name}'")
+        
+        # Store files_processed for the calling method
+        self._last_files_processed = files_processed
+        
         return chunks
     
     async def _extract_chunks_from_file(self, file_path: str, project_name: str) -> List[CodeChunk]:
         """Extract code chunks from a single file."""
         chunks = []
         
+        logger.debug(f"Starting chunk extraction from file: {file_path}")
+        
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
+            logger.debug(f"Read {len(content)} characters from {file_path}")
+            
             # Simple chunking strategy - split by functions/classes
             # In a full implementation, this would use tree-sitter AST
             lines = content.split('\n')
+            logger.debug(f"File has {len(lines)} lines")
             
             current_chunk_lines = []
             current_start_line = 1
@@ -332,6 +403,8 @@ class ProjectMemory:
                     stripped.startswith('function ') or
                     stripped.startswith('export function')):
                     
+                    logger.debug(f"Found chunk boundary at line {i}: {stripped[:50]}...")
+                    
                     # Save previous chunk if it exists
                     if current_chunk_lines:
                         chunk = self._create_chunk_from_lines(
@@ -344,6 +417,9 @@ class ProjectMemory:
                         )
                         if chunk:
                             chunks.append(chunk)
+                            logger.debug(f"Created chunk {chunk.id}")
+                        else:
+                            logger.debug(f"Chunk was filtered out (too small)")
                         chunk_id += 1
                     
                     # Start new chunk
@@ -364,10 +440,16 @@ class ProjectMemory:
                 )
                 if chunk:
                     chunks.append(chunk)
+                    logger.debug(f"Created final chunk {chunk.id}")
+                else:
+                    logger.debug(f"Final chunk was filtered out (too small)")
         
         except Exception as e:
             logger.error(f"Failed to extract chunks from file {file_path}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
         
+        logger.debug(f"Extracted {len(chunks)} chunks from file {file_path}")
         return chunks
     
     def _create_chunk_from_lines(self, lines: List[str], file_path: str, project_name: str,
@@ -387,8 +469,12 @@ class ProjectMemory:
         else:
             chunk_type = 'module'
         
-        # Generate unique ID
-        chunk_id_str = f"{project_name}_{Path(file_path).name}_{start_line}_{chunk_id}"
+        # Generate unique ID using hash of file path + start line + chunk id  
+        import hashlib
+        # Create a unique identifier that includes file path, start line, and chunk sequence
+        unique_string = f"{file_path}_{start_line}_{chunk_id}"
+        hash_suffix = hashlib.md5(unique_string.encode()).hexdigest()[:8]
+        chunk_id_str = f"{project_name}_{Path(file_path).name}_{start_line}_{hash_suffix}"
         
         return CodeChunk(
             id=chunk_id_str,

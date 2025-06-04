@@ -49,7 +49,7 @@ languages = [
 "Bug Tracker" = "https://github.com/wrale/mcp-server-tree-sitter/issues"
 
 [project.scripts]
-mcp-server-tree-sitter = "mcp_server_tree_sitter.server:main"
+mcp-server-repo-memory = "mcp_server_tree_sitter.server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcp_server_tree_sitter"]
